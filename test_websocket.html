@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Test</title>
+</head>
+<body>
+    <h1>GitHub Events WebSocket Test</h1>
+    <button onclick="connect()">Connect</button>
+    <button onclick="send()">Send Ping</button>
+    <button onclick="disconnect()">Disconnect</button>
+    
+    <div id="messages" style="border: 1px solid #ccc; padding: 10px; margin: 10px 0; height: 300px; overflow-y: scroll;"></div>
+    
+    <script>
+        let ws = null;
+        
+        function connect() {
+            ws = new WebSocket('ws://localhost:8000/ws/events');
+            
+            ws.onopen = function() {
+                log('WebSocket connected');
+            };
+            
+            ws.onmessage = function(event) {
+                log('Message from server: ' + event.data);
+            };
+            
+            ws.onerror = function(error) {
+                log('WebSocket error: ' + error);
+            };
+            
+            ws.onclose = function() {
+                log('WebSocket closed');
+            };
+        }
+        
+        function send() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send('ping');
+                log('Sent: ping');
+            } else {
+                log('WebSocket is not connected');
+            }
+        }
+        
+        function disconnect() {
+            if (ws) {
+                ws.close();
+            }
+        }
+        
+        function log(message) {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML += '<p>' + message + '</p>';
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        // Auto connect
+        window.onload = function() {
+            setTimeout(connect, 1000);
+        };
+    </script>
+</body>
+</html>
