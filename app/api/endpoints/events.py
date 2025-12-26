@@ -82,7 +82,7 @@ async def delete_event(
     logger.info(f"Event {event_id} deleted successfully")
     return None
 
-@router.get("/repo/{repo_name}", response_model=List[RepoEvent])
+@router.get("/repo/{repo_name:path}", response_model=List[RepoEvent])  # Изменено: добавлено :path
 async def read_repo_events(
     repo_name: str,
     db: AsyncSession = Depends(get_db_session),

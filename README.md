@@ -1,28 +1,51 @@
 # GitHub Monitor API
 
-Асинхронный Backend сервис для мониторинга событий GitHub репозиториев.
+Асинхронный Backend сервис для мониторинга событий GitHub репозиториев с использованием FastAPI, WebSocket, NATS и фоновых задач.
 
 ## Функциональность
 
-- REST API для управления событиями
-- WebSocket для real-time уведомлений
-- Фоновая задача для автоматического сбора событий с GitHub
-- Интеграция с NATS для публикации/подписки на события
-- Асинхронная работа с SQLite БД
+- **REST API** для управления событиями GitHub репозиториев
+- **WebSocket** для real-time уведомлений о новых событиях
+- **Фоновая задача** для автоматического сбора событий с GitHub API
+- **NATS integration** для публикации/подписки на события
+- **Асинхронная БД** SQLite с SQLAlchemy 2.0
+- **Swagger UI** автоматическая документация API
 
-## Технологии
+### Локальный запуск 
 
-- FastAPI
-- SQLAlchemy 2.0 + SQLite
-- WebSocket
-- NATS
-- httpx
-- Docker + Docker Compose
-
-## Запуск проекта
-
-### Способ 1: Локально (без Docker)
-
-1. Установите зависимости:
+#### 1. Установите зависимости
 ```bash
+# Создайте виртуальное окружение
+python -m venv venv
+
+# Активируйте (Linux/Mac)
+source venv/bin/activate
+
+# Активируйте (Windows)
+venv\Scripts\activate
+
+# Установите зависимости
 pip install -r requirements.txt
+```
+
+2. Запустите NATS сервер
+
+bash
+# Используя Docker (рекомендуется)
+docker run -p 4222:4222 -p 8222:8222 nats:latest
+
+# Или установите NATS CLI и запустите сервер
+brew install nats-io/nats-tools/nats  # macOS
+nats-server
+
+3. Запустите приложение
+
+bash
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+4. Откройте в браузере
+
+Документация API: http://localhost:8000/docs
+ReDoc документация: http://localhost:8000/redoc
+NATS Web UI: http://localhost:8222
+Корневой эндпоинт: http://localhost:8000

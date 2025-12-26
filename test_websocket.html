@@ -1,15 +1,32 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>WebSocket Test</title>
+    <title>GitHub Events WebSocket Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .connected { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .disconnected { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        #messages { border: 1px solid #ccc; padding: 10px; margin: 10px 0; height: 400px; overflow-y: scroll; }
+        .message { margin: 5px 0; padding: 5px; border-bottom: 1px solid #eee; }
+        .event-new { background-color: #e7f4e4; }
+        .event-deleted { background-color: #f4e4e4; }
+        button { margin: 5px; padding: 8px 16px; }
+    </style>
 </head>
 <body>
     <h1>GitHub Events WebSocket Test</h1>
-    <button onclick="connect()">Connect</button>
-    <button onclick="send()">Send Ping</button>
-    <button onclick="disconnect()">Disconnect</button>
     
-    <div id="messages" style="border: 1px solid #ccc; padding: 10px; margin: 10px 0; height: 300px; overflow-y: scroll;"></div>
+    <div id="status" class="disconnected">Disconnected</div>
+    
+    <div>
+        <button onclick="connect()">Connect</button>
+        <button onclick="sendPing()">Send Ping</button>
+        <button onclick="createTestEvent()">Create Test Event</button>
+        <button onclick="disconnect()">Disconnect</button>
+    </div>
+    
+    <div id="messages"></div>
     
     <script>
         let ws = null;
@@ -18,29 +35,60 @@
             ws = new WebSocket('ws://localhost:8000/ws/events');
             
             ws.onopen = function() {
-                log('WebSocket connected');
+                updateStatus('connected', 'Connected to WebSocket');
+                log('System', 'WebSocket connected successfully');
             };
             
             ws.onmessage = function(event) {
-                log('Message from server: ' + event.data);
+                try {
+                    const data = JSON.parse(event.data);
+                    log('Event', data, data.event_type);
+                } catch (e) {
+                    log('System', 'Received: ' + event.data);
+                }
             };
             
             ws.onerror = function(error) {
-                log('WebSocket error: ' + error);
+                log('Error', 'WebSocket error: ' + error);
             };
             
             ws.onclose = function() {
-                log('WebSocket closed');
+                updateStatus('disconnected', 'Disconnected');
+                log('System', 'WebSocket connection closed');
             };
         }
         
-        function send() {
+        function sendPing() {
             if (ws && ws.readyState === WebSocket.OPEN) {
                 ws.send('ping');
-                log('Sent: ping');
+                log('You', 'Sent: ping');
             } else {
-                log('WebSocket is not connected');
+                log('Error', 'WebSocket is not connected');
             }
+        }
+        
+        function createTestEvent() {
+            // Отправляем запрос на создание тестового события через REST API
+            fetch('http://localhost:8000/events', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    repo_name: "test/websocket",
+                    event_type: "WebSocketTestEvent",
+                    actor_login: "websocket_user",
+                    created_at: new Date().toISOString(),
+                    payload: { test: "WebSocket notification test" }
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                log('System', 'Test event created: ' + data.id);
+            })
+            .catch(error => {
+                log('Error', 'Failed to create test event: ' + error);
+            });
         }
         
         function disconnect() {
@@ -49,13 +97,38 @@
             }
         }
         
-        function log(message) {
+        function updateStatus(status, message) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = status === 'connected' ? 'status connected' : 'status disconnected';
+        }
+        
+        function log(sender, message, eventType = '') {
             const messagesDiv = document.getElementById('messages');
-            messagesDiv.innerHTML += '<p>' + message + '</p>';
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            
+            if (eventType === 'new_event') {
+                messageDiv.classList.add('event-new');
+            } else if (eventType === 'deleted_event') {
+                messageDiv.classList.add('event-deleted');
+            }
+            
+            const timestamp = new Date().toLocaleTimeString();
+            let content = `[${timestamp}] ${sender}: `;
+            
+            if (typeof message === 'object') {
+                content += JSON.stringify(message, null, 2);
+            } else {
+                content += message;
+            }
+            
+            messageDiv.textContent = content;
+            messagesDiv.appendChild(messageDiv);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
         
-        // Auto connect
+        // Auto connect on page load
         window.onload = function() {
             setTimeout(connect, 1000);
         };

@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import asyncio
+import logging
 
 from app.config import settings
 from app.database import engine, Base
@@ -11,6 +12,9 @@ from app.services.nats_service import nats_client
 from app.nats.subscriber import start_nats_subscriber
 from app.tasks.background import background_task
 from app.services.github_service import github_service
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
