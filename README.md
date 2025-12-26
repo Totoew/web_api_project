@@ -31,12 +31,8 @@ pip install -r requirements.txt
 2. Запустите NATS сервер
 
 bash
-# Используя Docker (рекомендуется)
+# Используя Docker 
 docker run -p 4222:4222 -p 8222:8222 nats:latest
-
-# Или установите NATS CLI и запустите сервер
-brew install nats-io/nats-tools/nats  # macOS
-nats-server
 
 3. Запустите приложение
 
@@ -45,7 +41,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 4. Откройте в браузере
 
-Документация API: http://localhost:8000/docs
-ReDoc документация: http://localhost:8000/redoc
-NATS Web UI: http://localhost:8222
-Корневой эндпоинт: http://localhost:8000
+- Документация API: http://localhost:8000/docs
+- ReDoc документация: http://localhost:8000/redoc
+- NATS Web UI: http://localhost:8222
+- Корневой эндпоинт: http://localhost:8000
