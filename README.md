@@ -30,13 +30,11 @@ pip install -r requirements.txt
 
 2. Запустите NATS сервер
 
-bash
 # Используя Docker 
 docker run -p 4222:4222 -p 8222:8222 nats:latest
 
 3. Запустите приложение
 
-bash
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 4. Откройте в браузере
