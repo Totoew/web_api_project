@@ -22,10 +22,7 @@ async def fetch_and_process_events():
             
             new_events_count = 0
             for event_data in events_data:
-                # Проверяем, не сохранили ли мы уже это событие
-                # (можно проверять по ID события от GitHub или по created_at)
-                
-                # Создаем объект для сохранения
+               
                 event_create = RepoEventCreate(
                     repo_name=repo_full_name,
                     event_type=event_data.get("type", "UnknownEvent"),

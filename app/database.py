@@ -6,7 +6,7 @@ from app.config import settings
 # Создаем асинхронный движок для SQLite
 engine = create_async_engine(
     settings.database_url,
-    echo=True,  # Логируем SQL-запросы (можно отключить в продакшене)
+    echo=True,  
     future=True,
 )
 
@@ -21,7 +21,7 @@ AsyncSessionLocal = async_sessionmaker(
 class Base(DeclarativeBase):
     pass
 
-# Функция для получения сессии БД (будет использоваться в зависимостях FastAPI)
+# Функция для получения сессии БД 
 async def get_db() -> AsyncSession:
     async with AsyncSessionLocal() as session:
         yield session

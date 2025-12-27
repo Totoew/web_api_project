@@ -31,48 +31,48 @@ async def lifespan(app: FastAPI):
     try:
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
-            print("✅ Database tables created successfully")
+            print("Database tables created successfully")
     except Exception as e:
         print(f"Database error: {e}")
     
 
     await nats_client.connect()
-    print(f"✅ NATS connected: {nats_client.is_connected}")
+    print(f"NATS connected: {nats_client.is_connected}")
     
     # Запускаем подписчика NATS
     try:
         await start_nats_subscriber()
-        print("✅ NATS subscriber started")
+        print(" NATS subscriber started")
     except Exception as e:
         print(f"❌ NATS subscriber error: {e}")
     
     # Запускаем фоновую задачу
     task = asyncio.create_task(background_task())
-    print("✅ Background task started")
+    print("Background task started")
     
     yield
     
-    # Shutdown
+    
     print("\n" + "=" * 50)
     print("Shutting down...")
     
-    # Отменяем фоновую задачу
+    
     task.cancel()
     try:
         await task
-        print("✅ Background task stopped gracefully")
+        print(" Background task stopped gracefully")
     except asyncio.CancelledError:
-        print("⚠️  Background task cancelled")
+        print(" Background task cancelled")
     except Exception as e:
-        print(f"❌ Error stopping background task: {e}")
+        print(f"Error stopping background task: {e}")
     
     # Закрываем соединение с NATS
     await nats_client.close()
-    print("✅ NATS connection closed")
+    print("NATS connection closed")
     
     # Закрываем HTTP клиент
     await github_service.close()
-    print("✅ GitHub service closed")
+    print("GitHub service closed")
     print("=" * 50)
 
 # Создаем приложение FastAPI
@@ -86,7 +86,7 @@ app = FastAPI(
 # Настраиваем CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # В продакшене заменить на конкретные домены
+    allow_origins=["*"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

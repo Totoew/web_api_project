@@ -3,7 +3,7 @@ from app.services.nats_service import nats_client
 from app.config import settings
 from app.tasks.background import manual_fetch_github_events
 
-async def handle_nats_message(msg):  # Обратите внимание: handle_nats_message (без s)
+async def handle_nats_message(msg):  
     """Callback-функция для обработки сообщений из NATS"""
     try:
         data = json.loads(msg.data.decode())
@@ -22,4 +22,4 @@ async def handle_nats_message(msg):  # Обратите внимание: handle
 async def start_nats_subscriber():
     """Запуск подписчика NATS"""
     if nats_client.is_connected:
-        await nats_client.subscribe(settings.nats_commands_channel, handle_nats_message)  # передаем handle_nats_message
+        await nats_client.subscribe(settings.nats_commands_channel, handle_nats_message)  

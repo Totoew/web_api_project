@@ -19,6 +19,5 @@ class RepoEvent(Base):
     payload: Mapped[dict] = mapped_column(JSON, nullable=True)  # Основные данные события
     raw_data: Mapped[dict] = mapped_column(JSON, nullable=True) # Полный ответ от GitHub
     
-    # Метод для красивого отображения
     def __repr__(self):
         return f"<RepoEvent {self.event_type} for {self.repo_name} at {self.created_at}>"
