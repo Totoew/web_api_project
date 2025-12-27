@@ -52,3 +52,5 @@ secrets/
 /static/
 /media/
 /uploads/
+github_events.db
+*.db
